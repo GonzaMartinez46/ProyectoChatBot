@@ -1,0 +1,7 @@
+Hola
+como estas?
+Gonzalo
+Matias
+presupuesto GNC dia 1: 50
+presupuesto GNC dia 2: 70
+presupuesto GNC dia 3: 80

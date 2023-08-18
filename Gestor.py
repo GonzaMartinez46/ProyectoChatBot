@@ -4,11 +4,12 @@ from langchain.document_loaders import PyPDFLoader, UnstructuredFileIOLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
+from langchain.chains import RetrievalQA
+
 
 class Gestor:
 
-    def __init__(self, api_key, embedding) -> None:
-        self.api_key= api_key
+    def __init__(self,  embedding):
         self.embedding= embedding
 
 
@@ -22,15 +23,15 @@ class Gestor:
 
         return ml_papers
     
-    def dividir_documentos(self, documentos):
+    def dividir_documentos(self, documentos, chunk_size, chunk_ovelap):
         text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1500,
-        chunk_overlap=200,
+        chunk_size = chunk_size,
+        chunk_overlap = chunk_ovelap,
         length_function=len)
         documents = text_splitter.split_documents(documentos)
         return documents
     
-    def crear_embeddings(self, documents):
+    def crear_embeddings(self, documents, chat):
         embeddings = OpenAIEmbeddings(model= self.embedding)
         vectorstore = Chroma.from_documents(
             documents= documents,
@@ -39,3 +40,14 @@ class Gestor:
         retriever = vectorstore.as_retriever(
             search_kwargs={"k":2}
         )
+        
+        qa_chain= RetrievalQA.from_chain_type(
+        llm=chat,
+        chain_type="stuff",
+        retriever=retriever
+        )
+        return qa_chain
+    
+
+        
+    
